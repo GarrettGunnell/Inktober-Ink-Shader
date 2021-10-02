@@ -5,7 +5,22 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class Ink : MonoBehaviour {
 
-    public void onRenderImage(RenderTexture target, RenderTexture destination) {
-        Graphics.Blit(target, destination);
+    public Shader inkShader;
+
+    private Material inkMaterial;
+
+    void OnEnable() {
+        if (inkMaterial == null) {
+            inkMaterial = new Material(inkShader);
+            inkMaterial.hideFlags = HideFlags.HideAndDontSave;
+        }
+    }
+
+    void OnDisable() {
+        inkMaterial = null;
+    }
+
+    void OnRenderImage(RenderTexture source, RenderTexture destination) {
+        Graphics.Blit(source, destination, inkMaterial);
     }
 }
