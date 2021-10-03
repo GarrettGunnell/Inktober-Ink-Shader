@@ -1,51 +1,63 @@
-﻿Shader "Hidden/Ink"
-{
-    Properties
-    {
+﻿Shader "Hidden/Ink" {
+    Properties {
         _MainTex ("Texture", 2D) = "white" {}
     }
-    SubShader
-    {
-        // No culling or depth
+
+    SubShader {
         Cull Off ZWrite Off ZTest Always
 
-        Pass
-        {
+        Pass {
             CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            #pragma vertex vp
+            #pragma fragment fp
 
             #include "UnityCG.cginc"
 
-            struct appdata
-            {
+            sampler2D _MainTex;
+            float4 _MainTex_TexelSize;
+
+            struct VertexData {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
             };
 
-            struct v2f
-            {
+            struct v2f {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
             };
 
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
-                return o;
+            v2f vp(VertexData v) {
+                v2f f;
+                f.vertex = UnityObjectToClipPos(v.vertex);
+                f.uv = v.uv;
+                
+                return f;
             }
 
-            sampler2D _MainTex;
+            half SampleLuminance(float2 uv) {
+                return LinearRgbToLuminance(tex2D(_MainTex, uv));
+            }
 
-            fixed4 frag (v2f i) : SV_Target
-            {
+            half SampleLuminance(float2 uv, float uOffset, float vOffset) {
+                uv += _MainTex_TexelSize * float2(uOffset, vOffset);
+                return SampleLuminance(uv);
+            }
+
+            fixed4 fp(v2f i) : SV_Target {
                 fixed4 col = tex2D(_MainTex, i.uv);
-                // just invert the colors
-                col.rgb = 1 - col.rgb;
-                return col;
+
+                half m = SampleLuminance(i.uv);
+                half n = SampleLuminance(i.uv, 0, 1);
+                half e = SampleLuminance(i.uv, 1, 0);
+                half s = SampleLuminance(i.uv, 0, -1);
+                half w = SampleLuminance(i.uv, -1, 0);
+                half highest = max(max(max(max(n, e), s), w), m);
+                half lowest = min(min(min(min(n, e), s), w), m);
+                half contrast = highest - lowest;
+                
+                return contrast < 0.1 ? 1 : 0;
             }
+
             ENDCG
         }
     }
