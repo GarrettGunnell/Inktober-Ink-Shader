@@ -6,6 +6,10 @@ using UnityEngine;
 public class Ink : MonoBehaviour {
 
     public Shader inkShader;
+    public Texture background;
+    
+    [Range(0.01f, 1.0f)]
+    public float contrastThreshold = 0.5f;
 
     private Material inkMaterial;
 
@@ -21,6 +25,8 @@ public class Ink : MonoBehaviour {
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
+        inkMaterial.SetFloat("_ContrastThreshold", contrastThreshold);
+        inkMaterial.SetTexture("_PaperTex", background);
         Graphics.Blit(source, destination, inkMaterial);
     }
 }

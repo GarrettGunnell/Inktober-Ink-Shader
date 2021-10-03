@@ -14,7 +14,9 @@
             #include "UnityCG.cginc"
 
             sampler2D _MainTex;
+            sampler2D _PaperTex;
             float4 _MainTex_TexelSize;
+            float _ContrastThreshold;
 
             struct VertexData {
                 float4 vertex : POSITION;
@@ -55,7 +57,7 @@
                 half lowest = min(min(min(min(n, e), s), w), m);
                 half contrast = highest - lowest;
                 
-                return contrast < 0.1 ? 1 : 0;
+                return contrast < _ContrastThreshold ? tex2D(_PaperTex, i.uv) : 0;
             }
 
             ENDCG
