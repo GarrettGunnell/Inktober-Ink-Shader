@@ -33,6 +33,19 @@
     SubShader {
         Cull Off ZWrite Off ZTest Always
 
+        // Luminance Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            fixed4 fp(v2f i) : SV_Target {
+                return LinearRgbToLuminance(tex2D(_MainTex, i.uv));
+            }
+
+            ENDCG
+        }
+
         // Edge Detection By Contrast
         Pass {
             CGPROGRAM

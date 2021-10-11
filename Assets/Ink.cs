@@ -9,7 +9,7 @@ public class Ink : MonoBehaviour {
     public Texture background;
 
     public enum EdgeDetector {
-        contrast = 0,
+        contrast = 1,
         sobelFeldman,
         prewitt
     } public EdgeDetector edgeDetector;
