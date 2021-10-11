@@ -7,6 +7,11 @@ public class Ink : MonoBehaviour {
 
     public Shader inkShader;
     public Texture background;
+
+    public enum EdgeDetector {
+        contrast = 0,
+        sobelFeldman
+    } public EdgeDetector edgeDetector;
     
     [Range(0.01f, 1.0f)]
     public float contrastThreshold = 0.5f;
@@ -27,6 +32,6 @@ public class Ink : MonoBehaviour {
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         inkMaterial.SetFloat("_ContrastThreshold", contrastThreshold);
         inkMaterial.SetTexture("_PaperTex", background);
-        Graphics.Blit(source, destination, inkMaterial);
+        Graphics.Blit(source, destination, inkMaterial, (int)edgeDetector);
     }
 }
