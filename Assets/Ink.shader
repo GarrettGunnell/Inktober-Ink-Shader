@@ -60,7 +60,7 @@
                 half lowest = min(min(min(min(n, e), s), w), m);
                 half contrast = highest - lowest;
                 
-                return contrast < _ContrastThreshold ? 1 : 0;
+                return contrast;
             }
 
             ENDCG
@@ -100,8 +100,53 @@
                         Gy += Ky[x + 1][y + 1] * l;
                     }
                 }
+
+                float Mag = sqrt(Gx * Gx + Gy * Gy);
                 
-                return sqrt(Gx * Gx + Gy * Gy);
+                return Mag;
+            }
+
+            ENDCG
+        }
+
+        // Edge Detection By Prewitt Operator
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            fixed4 fp(v2f i) : SV_Target {
+                fixed4 col = tex2D(_MainTex, i.uv);
+                int x, y;
+
+                int3x3 Kx = {
+                    1, 0, -1,
+                    1, 0, -1,
+                    1, 0, -1
+                };
+
+                int3x3 Ky = {
+                    1, 1, 1,
+                    0, 0, 0,
+                    -1, -1, -1
+                };
+
+                float Gx = 0.0f;
+                float Gy = 0.0f;
+
+                for (x = -1; x <= 1; ++x) {
+                    for (y = -1; y <= 1; ++y) {
+                        float2 uv = i.uv + _MainTex_TexelSize * float2(x, y);
+                        
+                        half l = LinearRgbToLuminance(tex2D(_MainTex, uv));
+                        Gx += Kx[x + 1][y + 1] * l;
+                        Gy += Ky[x + 1][y + 1] * l;
+                    }
+                }
+
+                float Mag = sqrt(Gx * Gx + Gy * Gy);
+                
+                return Mag;
             }
 
             ENDCG
