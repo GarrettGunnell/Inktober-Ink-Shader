@@ -3,6 +3,33 @@
         _MainTex ("Texture", 2D) = "white" {}
     }
 
+    CGINCLUDE
+        #include "UnityCG.cginc"
+
+        sampler2D _MainTex;
+        sampler2D _PaperTex;
+        float4 _MainTex_TexelSize;
+        float _ContrastThreshold;
+
+        struct VertexData {
+            float4 vertex : POSITION;
+            float2 uv : TEXCOORD0;
+        };
+
+        struct v2f {
+            float2 uv : TEXCOORD0;
+            float4 vertex : SV_POSITION;
+        };
+
+        v2f vp(VertexData v) {
+            v2f f;
+            f.vertex = UnityObjectToClipPos(v.vertex);
+            f.uv = v.uv;
+            
+            return f;
+        }
+    ENDCG
+
     SubShader {
         Cull Off ZWrite Off ZTest Always
 
@@ -10,31 +37,6 @@
             CGPROGRAM
             #pragma vertex vp
             #pragma fragment fp
-
-            #include "UnityCG.cginc"
-
-            sampler2D _MainTex;
-            sampler2D _PaperTex;
-            float4 _MainTex_TexelSize;
-            float _ContrastThreshold;
-
-            struct VertexData {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
-
-            v2f vp(VertexData v) {
-                v2f f;
-                f.vertex = UnityObjectToClipPos(v.vertex);
-                f.uv = v.uv;
-                
-                return f;
-            }
 
             half SampleLuminance(float2 uv) {
                 return LinearRgbToLuminance(tex2D(_MainTex, uv));
@@ -57,7 +59,7 @@
                 half lowest = min(min(min(min(n, e), s), w), m);
                 half contrast = highest - lowest;
                 
-                return contrast < _ContrastThreshold ? tex2D(_PaperTex, i.uv) : 0;
+                return contrast < _ContrastThreshold ? 1 : 0;
             }
 
             ENDCG
