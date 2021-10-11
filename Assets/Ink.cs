@@ -33,6 +33,11 @@ public class Ink : MonoBehaviour {
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         inkMaterial.SetFloat("_ContrastThreshold", contrastThreshold);
         inkMaterial.SetTexture("_PaperTex", background);
-        Graphics.Blit(source, destination, inkMaterial, (int)edgeDetector);
+
+        RenderTexture luminanceSource = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
+        Graphics.Blit(source, luminanceSource, inkMaterial, 0);
+        RenderTexture.ReleaseTemporary(luminanceSource);
+
+        Graphics.Blit(luminanceSource, destination, inkMaterial, (int)edgeDetector);
     }
 }

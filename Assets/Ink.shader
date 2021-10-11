@@ -53,7 +53,7 @@
             #pragma fragment fp
 
             half SampleLuminance(float2 uv) {
-                return LinearRgbToLuminance(tex2D(_MainTex, uv));
+                return tex2D(_MainTex, uv).a;
             }
 
             half SampleLuminance(float2 uv, float uOffset, float vOffset) {
@@ -62,8 +62,6 @@
             }
 
             fixed4 fp(v2f i) : SV_Target {
-                fixed4 col = tex2D(_MainTex, i.uv);
-
                 half m = SampleLuminance(i.uv);
                 half n = SampleLuminance(i.uv, 0, 1);
                 half e = SampleLuminance(i.uv, 1, 0);
@@ -86,7 +84,6 @@
             #pragma fragment fp
 
             fixed4 fp(v2f i) : SV_Target {
-                fixed4 col = tex2D(_MainTex, i.uv);
                 int x, y;
 
                 int3x3 Kx = {
@@ -108,7 +105,7 @@
                     for (y = -1; y <= 1; ++y) {
                         float2 uv = i.uv + _MainTex_TexelSize * float2(x, y);
                         
-                        half l = LinearRgbToLuminance(tex2D(_MainTex, uv));
+                        half l = tex2D(_MainTex, uv).a;
                         Gx += Kx[x + 1][y + 1] * l;
                         Gy += Ky[x + 1][y + 1] * l;
                     }
@@ -129,7 +126,6 @@
             #pragma fragment fp
 
             fixed4 fp(v2f i) : SV_Target {
-                fixed4 col = tex2D(_MainTex, i.uv);
                 int x, y;
 
                 int3x3 Kx = {
@@ -151,7 +147,7 @@
                     for (y = -1; y <= 1; ++y) {
                         float2 uv = i.uv + _MainTex_TexelSize * float2(x, y);
                         
-                        half l = LinearRgbToLuminance(tex2D(_MainTex, uv));
+                        half l = tex2D(_MainTex, uv).a;
                         Gx += Kx[x + 1][y + 1] * l;
                         Gy += Ky[x + 1][y + 1] * l;
                     }
