@@ -33,6 +33,7 @@
     SubShader {
         Cull Off ZWrite Off ZTest Always
 
+        // Edge Detection By Contrast
         Pass {
             CGPROGRAM
             #pragma vertex vp
@@ -60,6 +61,37 @@
                 half contrast = highest - lowest;
                 
                 return contrast < _ContrastThreshold ? 1 : 0;
+            }
+
+            ENDCG
+        }
+
+        // Edge Detection By Sobel-Feldman Operator
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            half SampleLuminance(float2 uv) {
+                return LinearRgbToLuminance(tex2D(_MainTex, uv));
+            }
+
+            half SampleLuminance(float2 uv, float uOffset, float vOffset) {
+                uv += _MainTex_TexelSize * float2(uOffset, vOffset);
+                return SampleLuminance(uv);
+            }
+
+            fixed4 fp(v2f i) : SV_Target {
+                fixed4 col = tex2D(_MainTex, i.uv);
+                int x, y;
+
+                for (x = -1; x <= 1; ++x) {
+                    for (y = -1; y <= 1; ++y) {
+                        continue;
+                    }
+                }
+                
+                return 1 - col;
             }
 
             ENDCG
