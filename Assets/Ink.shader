@@ -10,6 +10,8 @@
         sampler2D _PaperTex;
         float4 _MainTex_TexelSize;
         float _ContrastThreshold;
+        float _HighThreshold;
+        float _LowThreshold;
 
         struct VertexData {
             float4 vertex : POSITION;
@@ -204,7 +206,7 @@
             ENDCG
         }
 
-        // Canny Threshold Pass 1
+        // Canny Magnitude Suppression Pass
         Pass {
             CGPROGRAM
             #pragma vertex vp
@@ -216,19 +218,41 @@
                 float Mag = canny.a;
                 float theta = degrees(canny.b);
 
-                float result = 0.0f;
+                float4 result = 0.0f;
 
                 if ((0.0f <= theta && theta <= 45.0f) || (135.0f <= theta && theta <= 180.0f)) {
                     float northMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1)).a;
                     float southMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, 1)).a;
 
-                    result = Mag >= northMag && Mag >= southMag ? 1.0f : 0.0f;
+                    result = Mag >= northMag && Mag >= southMag ? canny : 0.0f;
                 } else if (45.0f <= theta && theta <= 135.0f) {
                     float westMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(-1, 0)).a;
                     float eastMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, 0)).a;
 
-                    result = Mag >= westMag && Mag >= eastMag ? 1.0f : 0.0f;
+                    result = Mag >= westMag && Mag >= eastMag ? canny : 0.0f;
                 }
+
+                return result;
+            }
+
+            ENDCG
+        }
+
+        // Canny Double Threshold Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            float4 fp(v2f i) : SV_Target {
+                float4 Mag = tex2D(_MainTex, i.uv).a;
+                
+                float4 result = 0.0f;
+
+                if (Mag > _HighThreshold)
+                    result = 1.0f;
+                else if (Mag > _LowThreshold)
+                    result = float4(1.0f, 1.0f, 1.0f, 0.0f);
 
                 return result;
             }

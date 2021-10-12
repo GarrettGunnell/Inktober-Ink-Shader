@@ -19,6 +19,12 @@ public class Ink : MonoBehaviour {
     [Range(0.01f, 1.0f)]
     public float contrastThreshold = 0.5f;
 
+    [Range(0.01f, 1.0f)]
+    public float highThreshold = 0.8f;
+
+    [Range(0.01f, 1.0f)]
+    public float lowThreshold = 0.1f;
+
     public bool capturing = false;
 
     private Material inkMaterial;
@@ -47,6 +53,8 @@ public class Ink : MonoBehaviour {
         Graphics.Blit(source, luminanceSource, inkMaterial, 0);
         
         if (edgeDetector == EdgeDetector.canny) {
+            inkMaterial.SetFloat("_LowThreshold", lowThreshold);
+            inkMaterial.SetFloat("_HighThreshold", highThreshold);
             RenderTexture gradientSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(luminanceSource, gradientSource, inkMaterial, 4);
 
@@ -58,7 +66,7 @@ public class Ink : MonoBehaviour {
             RenderTexture.ReleaseTemporary(gradientSource);
             RenderTexture.ReleaseTemporary(thresholdSource);
 
-            Graphics.Blit(gradientSource, destination, inkMaterial, 5);
+            Graphics.Blit(thresholdSource, destination, inkMaterial, 6);
         } else {
             RenderTexture.ReleaseTemporary(luminanceSource);
             
