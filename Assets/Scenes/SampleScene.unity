@@ -145,7 +145,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 738919130}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
@@ -311,7 +311,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inkShader: {fileID: 4800000, guid: 94806dd6078f88642bf708a4aa8b5bdb, type: 3}
   background: {fileID: 2800000, guid: 62a4e203dba6f424e88e2ce3cc85800e, type: 3}
-  edgeDetector: 2
+  edgeDetector: 4
   contrastThreshold: 0.01
 --- !u!1 &1771996338
 GameObject:

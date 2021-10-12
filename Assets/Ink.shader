@@ -196,9 +196,41 @@
                 }
 
                 float Mag = sqrt(Gx * Gx + Gy * Gy);
-                float theta = atan2(Gy, Gx);
+                float theta = abs(atan2(Gy, Gx));
 
                 return float4(Gx, Gy, theta, Mag);
+            }
+
+            ENDCG
+        }
+
+        // Canny Threshold Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            float4 fp(v2f i) : SV_Target {
+                float4 canny = tex2D(_MainTex, i.uv);
+
+                float Mag = canny.a;
+                float theta = degrees(canny.b);
+
+                float result = 0.0f;
+
+                if (theta <= 45 || 135 <= theta) {
+                    float northMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(-1, 0)).a;
+                    float southMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, 0)).a;
+
+                    result = Mag >= max(max(northMag, southMag), Mag) ? 0.0f : 1.0f;
+                }   else if (45 <= theta && theta <= 135) {
+                    float westMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1)).a;
+                    float eastMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, 1)).a;
+
+                    result = Mag >= max(max(westMag, eastMag), Mag) ? 0.0f : 1.0f;
+                }
+             
+                return result;
             }
 
             ENDCG
