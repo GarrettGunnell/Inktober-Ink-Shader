@@ -47,12 +47,18 @@ public class Ink : MonoBehaviour {
         Graphics.Blit(source, luminanceSource, inkMaterial, 0);
         
         if (edgeDetector == EdgeDetector.canny) {
-            RenderTexture cannySource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
-            Graphics.Blit(luminanceSource, cannySource, inkMaterial, 4);
-            RenderTexture.ReleaseTemporary(luminanceSource);
-            RenderTexture.ReleaseTemporary(cannySource);
+            RenderTexture gradientSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
+            Graphics.Blit(luminanceSource, gradientSource, inkMaterial, 4);
 
-            Graphics.Blit(cannySource, destination, inkMaterial, 5);
+
+            RenderTexture thresholdSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
+            Graphics.Blit(gradientSource, thresholdSource, inkMaterial, 5);
+
+            RenderTexture.ReleaseTemporary(luminanceSource);
+            RenderTexture.ReleaseTemporary(gradientSource);
+            RenderTexture.ReleaseTemporary(thresholdSource);
+
+            Graphics.Blit(gradientSource, destination, inkMaterial, 5);
         } else {
             RenderTexture.ReleaseTemporary(luminanceSource);
             

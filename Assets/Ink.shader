@@ -204,7 +204,7 @@
             ENDCG
         }
 
-        // Canny Threshold Pass
+        // Canny Threshold Pass 1
         Pass {
             CGPROGRAM
             #pragma vertex vp
@@ -218,18 +218,18 @@
 
                 float result = 0.0f;
 
-                if (theta <= 45 || 135 <= theta) {
-                    float northMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(-1, 0)).a;
-                    float southMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, 0)).a;
+                if ((0.0f <= theta && theta <= 45.0f) || (135.0f <= theta && theta <= 180.0f)) {
+                    float northMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1)).a;
+                    float southMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, 1)).a;
 
-                    result = Mag >= max(max(northMag, southMag), Mag) ? 0.0f : 1.0f;
-                }   else if (45 <= theta && theta <= 135) {
-                    float westMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1)).a;
-                    float eastMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, 1)).a;
+                    result = Mag >= northMag && Mag >= southMag ? 1.0f : 0.0f;
+                } else if (45.0f <= theta && theta <= 135.0f) {
+                    float westMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(-1, 0)).a;
+                    float eastMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, 0)).a;
 
-                    result = Mag >= max(max(westMag, eastMag), Mag) ? 0.0f : 1.0f;
+                    result = Mag >= westMag && Mag >= eastMag ? 1.0f : 0.0f;
                 }
-             
+
                 return result;
             }
 
