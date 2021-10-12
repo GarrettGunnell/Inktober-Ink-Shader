@@ -59,14 +59,18 @@ public class Ink : MonoBehaviour {
             Graphics.Blit(luminanceSource, gradientSource, inkMaterial, 4);
 
 
-            RenderTexture thresholdSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
-            Graphics.Blit(gradientSource, thresholdSource, inkMaterial, 5);
+            RenderTexture magThresholdSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
+            Graphics.Blit(gradientSource, magThresholdSource, inkMaterial, 5);
+
+            RenderTexture doubleThresholdSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
+            Graphics.Blit(magThresholdSource, doubleThresholdSource, inkMaterial, 6);
 
             RenderTexture.ReleaseTemporary(luminanceSource);
             RenderTexture.ReleaseTemporary(gradientSource);
-            RenderTexture.ReleaseTemporary(thresholdSource);
+            RenderTexture.ReleaseTemporary(magThresholdSource);
+            RenderTexture.ReleaseTemporary(doubleThresholdSource);
 
-            Graphics.Blit(thresholdSource, destination, inkMaterial, 6);
+            Graphics.Blit(doubleThresholdSource, destination, inkMaterial, 7);
         } else {
             RenderTexture.ReleaseTemporary(luminanceSource);
             
