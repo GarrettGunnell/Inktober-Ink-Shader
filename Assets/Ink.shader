@@ -245,8 +245,8 @@
             #pragma fragment fp
 
             float4 fp(v2f i) : SV_Target {
-                float4 Mag = tex2D(_MainTex, i.uv).a;
-                
+                float Mag = tex2D(_MainTex, i.uv).a;
+
                 float4 result = 0.0f;
 
                 if (Mag > _HighThreshold)
