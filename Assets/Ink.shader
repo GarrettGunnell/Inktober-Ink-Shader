@@ -160,5 +160,48 @@
 
             ENDCG
         }
+
+        // Canny Intensity Pass (Sobel-Feldman)
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            float4 fp(v2f i) : SV_Target {
+                int x, y;
+
+                int3x3 Kx = {
+                    1, 0, -1,
+                    2, 0, -2,
+                    1, 0, -1
+                };
+
+                int3x3 Ky = {
+                    1, 2, 1,
+                    0, 0, 0,
+                    -1, -2, -1
+                };
+
+                float Gx = 0.0f;
+                float Gy = 0.0f;
+
+                for (x = -1; x <= 1; ++x) {
+                    for (y = -1; y <= 1; ++y) {
+                        float2 uv = i.uv + _MainTex_TexelSize * float2(x, y);
+                        
+                        half l = tex2D(_MainTex, uv).a;
+                        Gx += Kx[x + 1][y + 1] * l;
+                        Gy += Ky[x + 1][y + 1] * l;
+                    }
+                }
+
+                float Mag = sqrt(Gx * Gx + Gy * Gy);
+                float theta = atan2(Gy, Gx);
+
+                return float4(Gx, Gy, theta, Mag);
+            }
+
+            ENDCG
+        }
     }
 }

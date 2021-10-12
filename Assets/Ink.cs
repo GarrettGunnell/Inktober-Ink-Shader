@@ -11,7 +11,8 @@ public class Ink : MonoBehaviour {
     public enum EdgeDetector {
         contrast = 1,
         sobelFeldman,
-        prewitt
+        prewitt,
+        canny
     } public EdgeDetector edgeDetector;
     
     [Range(0.01f, 1.0f)]
