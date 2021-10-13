@@ -218,21 +218,19 @@
                 float Mag = canny.a;
                 float theta = degrees(canny.b);
 
-                float4 result = 0.0f;
-
                 if ((0.0f <= theta && theta <= 45.0f) || (135.0f <= theta && theta <= 180.0f)) {
                     float northMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1)).a;
                     float southMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, 1)).a;
 
-                    result = Mag >= northMag && Mag >= southMag ? canny : 0.0f;
+                    canny = Mag >= northMag && Mag >= southMag ? canny : 0.0f;
                 } else if (45.0f <= theta && theta <= 135.0f) {
                     float westMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(-1, 0)).a;
                     float eastMag = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, 0)).a;
 
-                    result = Mag >= westMag && Mag >= eastMag ? canny : 0.0f;
+                    canny = Mag >= westMag && Mag >= eastMag ? canny : 0.0f;
                 }
 
-                return result;
+                return canny;
             }
 
             ENDCG
@@ -249,10 +247,10 @@
 
                 float4 result = 0.0f;
 
-                if (Mag >= _HighThreshold)
+                if (Mag > _HighThreshold)
                     result = 1.0f;
-                else if (Mag >= _LowThreshold)
-                    result = float4(1.0f, 1.0f, 1.0f, 0.5f);
+                else if (Mag > _LowThreshold)
+                    result = 0.5f;
 
                 return result;
             }
@@ -268,12 +266,9 @@
 
             float4 fp(v2f i) : SV_Target {
                 int x, y;
-                float4 canny = tex2D(_MainTex, i.uv);
+                float strength = tex2D(_MainTex, i.uv).a;
 
-                float mag = canny.r;
-                float strength = canny.a;
-
-                float4 result = canny;
+                float4 result = float4(1.0f, 1.0f, 1.0f, 0.0f);
 
                 for (x = -1; x <= 1; ++x) {
                     for (y = -1; y <= 1; ++y) {
@@ -283,7 +278,40 @@
                         
                         half neighborStrength = tex2D(_MainTex, uv).a;
                         if (neighborStrength == 1.0f && strength == 0.5f) 
-                            result = 1.0f;
+                            result = float4(0.0f, 0.0f, 0.0f, 0.5f);
+                    }
+                }
+
+                if (strength == 1.0f)
+                    result = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+                return result;
+            }
+
+            ENDCG
+        }
+
+        // Line Width Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            float4 fp(v2f i) : SV_Target {
+                int x, y;
+                float4 ink = tex2D(_MainTex, i.uv);
+
+                float4 result = ink;
+
+                for (x = -1; x <= 1; ++x) {
+                    for (y = -1; y <= 1; ++y) {
+                        if (x == 0 && y == 0) continue;
+
+                        float2 uv = i.uv + _MainTex_TexelSize * float2(x, y);
+                        
+                        half neighborStrength = tex2D(_MainTex, uv).a;
+                        if (neighborStrength == 1.0f)
+                            result = 0.0f;
                     }
                 }
 

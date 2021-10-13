@@ -86,3 +86,7 @@ $RECYCLE.BIN/
 *.lnk
 
 Recordings
+*.png
+*.jpg
+*.png.meta
+*.jpg.meta

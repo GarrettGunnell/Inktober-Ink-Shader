@@ -9,6 +9,9 @@ public class Ink : MonoBehaviour {
     public Texture background;
     public GameObject lightObj;
 
+    public Texture image;
+    public bool useImage = false;
+
     public enum EdgeDetector {
         contrast = 1,
         sobelFeldman,
@@ -49,28 +52,36 @@ public class Ink : MonoBehaviour {
         inkMaterial.SetFloat("_ContrastThreshold", contrastThreshold);
         inkMaterial.SetTexture("_PaperTex", background);
 
-        RenderTexture luminanceSource = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
-        Graphics.Blit(source, luminanceSource, inkMaterial, 0);
+        int width = useImage ? image.width : source.width;
+        int height = useImage ? image.height : source.height;
+
+        RenderTexture luminanceSource = RenderTexture.GetTemporary(width, height, 0, source.format);
+        Graphics.Blit(useImage ? image : source, luminanceSource, inkMaterial, 0);
         
         if (edgeDetector == EdgeDetector.canny) {
             inkMaterial.SetFloat("_LowThreshold", lowThreshold);
             inkMaterial.SetFloat("_HighThreshold", highThreshold);
-            RenderTexture gradientSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
+            RenderTexture gradientSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(luminanceSource, gradientSource, inkMaterial, 4);
 
 
-            RenderTexture magThresholdSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
+            RenderTexture magThresholdSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(gradientSource, magThresholdSource, inkMaterial, 5);
 
-            RenderTexture doubleThresholdSource = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat);
+            RenderTexture doubleThresholdSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(magThresholdSource, doubleThresholdSource, inkMaterial, 6);
+
+            RenderTexture hysteresisSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
+            Graphics.Blit(doubleThresholdSource, hysteresisSource, inkMaterial, 7);
 
             RenderTexture.ReleaseTemporary(luminanceSource);
             RenderTexture.ReleaseTemporary(gradientSource);
             RenderTexture.ReleaseTemporary(magThresholdSource);
             RenderTexture.ReleaseTemporary(doubleThresholdSource);
+            RenderTexture.ReleaseTemporary(hysteresisSource);
 
-            Graphics.Blit(doubleThresholdSource, destination, inkMaterial, 7);
+            Graphics.Blit(hysteresisSource, destination, inkMaterial, 8);
+            //Graphics.Blit(hysteresisSource, destination);
         } else {
             RenderTexture.ReleaseTemporary(luminanceSource);
             
@@ -80,12 +91,12 @@ public class Ink : MonoBehaviour {
 
      private void Capture() {
         if (capturing) {
-            RenderTexture rt = new RenderTexture(512, 512, 24);
+            RenderTexture rt = new RenderTexture(600, 600, 24);
             GetComponent<Camera>().targetTexture = rt;
-            Texture2D screenshot = new Texture2D(512, 512, TextureFormat.RGB24, false);
+            Texture2D screenshot = new Texture2D(600, 600, TextureFormat.RGB24, false);
             GetComponent<Camera>().Render();
             RenderTexture.active = rt;
-            screenshot.ReadPixels(new Rect(0, 0, 512, 512), 0, 0);
+            screenshot.ReadPixels(new Rect(0, 0, 600, 600), 0, 0);
             GetComponent<Camera>().targetTexture = null;
             RenderTexture.active = null;
             Destroy(rt);
