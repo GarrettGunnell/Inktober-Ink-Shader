@@ -264,26 +264,33 @@
             #pragma vertex vp
             #pragma fragment fp
 
-            float4 fp(v2f i) : SV_Target {
+            float preserve(float2 uv) {
                 int x, y;
-                float strength = tex2D(_MainTex, i.uv).a;
 
-                float4 result = float4(1.0f, 1.0f, 1.0f, 0.0f);
-
+                [unroll]
                 for (x = -1; x <= 1; ++x) {
                     for (y = -1; y <= 1; ++y) {
                         if (x == 0 && y == 0) continue;
 
-                        float2 uv = i.uv + _MainTex_TexelSize * float2(x, y);
+                        float2 nuv = uv + _MainTex_TexelSize * float2(x, y);
                         
-                        half neighborStrength = tex2D(_MainTex, uv).a;
-                        if (neighborStrength == 1.0f && strength == 0.5f) 
-                            result = float4(0.0f, 0.0f, 0.0f, 0.5f);
+                        half neighborStrength = tex2D(_MainTex, nuv).a;
+                        if (neighborStrength == 1.0f) 
+                            return 1.0f;
                     }
                 }
 
-                if (strength == 1.0f)
-                    result = float4(0.0f, 0.0f, 0.0f, 1.0f);
+                return 0.0f;
+            }
+
+            float4 fp(v2f i) : SV_Target {
+                float strength = tex2D(_MainTex, i.uv).a;
+
+                float4 result = strength;
+
+                if (strength == 0.5f) {
+                    result = preserve(i.uv);
+                }
 
                 return result;
             }
@@ -301,21 +308,17 @@
                 int x, y;
                 float4 ink = tex2D(_MainTex, i.uv);
 
-                float4 result = ink;
 
-                for (x = -1; x <= 1; ++x) {
-                    for (y = -1; y <= 1; ++y) {
-                        if (x == 0 && y == 0) continue;
+                float4 topNeighbor = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1));
+                float4 rightNeighbor = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, -0));
 
-                        float2 uv = i.uv + _MainTex_TexelSize * float2(x, y);
-                        
-                        half neighborStrength = tex2D(_MainTex, uv).a;
-                        if (neighborStrength == 1.0f)
-                            result = 0.0f;
-                    }
-                }
+                if (topNeighbor.a != 0.0f)
+                    ink = 1.0f;
+                else if (rightNeighbor.a != 0.0f)
+                    ink = 1.0f;
 
-                return result;
+
+                return 1 - ink;
             }
 
             ENDCG
