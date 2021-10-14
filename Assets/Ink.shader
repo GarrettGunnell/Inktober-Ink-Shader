@@ -6,7 +6,7 @@
     CGINCLUDE
         #include "UnityCG.cginc"
 
-        sampler2D _MainTex;
+        sampler2D _MainTex, _CameraDepthTexture;
         sampler2D _PaperTex;
         sampler2D _NoiseTex;
         sampler2D _StippleTex;
@@ -18,6 +18,7 @@
         float _LuminanceCorrection;
         float _Contrast;
         float _StippleSize;
+        uint _UsingImage;
 
         struct VertexData {
             float4 vertex : POSITION;
@@ -389,6 +390,7 @@
                 luminance = min(1.0f, max(0.0f, luminance));
                 luminance = pow(luminance, 1.0f / _LuminanceCorrection);
                 luminance = min(1.0f, max(0.0f, luminance));
+                
 
                 return luminance < noise ? 1.0f : 0.0f;
             }
@@ -407,6 +409,15 @@
             float4 fp(v2f i) : SV_Target {
                 float edge = tex2D(_MainTex, i.uv).a;
                 float4 stipple = tex2D(_StippleTex, i.uv);
+                float depth = 1 - Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r);
+                depth = min(1.0f, max(0.0f, depth));
+
+                float4 result = 1 - (edge + stipple);
+
+                if (!_UsingImage) {
+                    if (depth < 0.0001)
+                        stipple *= depth;
+                }
 
                 return 1 - (edge + stipple);
             }

@@ -55,6 +55,11 @@ public class Ink : MonoBehaviour {
         inkMaterial = null;
     }
 
+    void Start() {
+        Camera cam = GetComponent<Camera>();
+        cam.depthTextureMode = cam.depthTextureMode | DepthTextureMode.Depth;
+    }
+
     void Update() {
         ++frameCount;
     }
@@ -66,6 +71,7 @@ public class Ink : MonoBehaviour {
         inkMaterial.SetFloat("_LuminanceCorrection", luminanceCorrection);
         inkMaterial.SetFloat("_Contrast", luminanceContrast);
         inkMaterial.SetFloat("_StippleSize", stippleSize);
+        inkMaterial.SetFloat("_UsingImage", useImage ? 1 : 0);
 
         int width = useImage ? image.width : source.width;
         int height = useImage ? image.height : source.height;
@@ -114,6 +120,7 @@ public class Ink : MonoBehaviour {
 
         RenderTexture.ReleaseTemporary(edgeSource);
         RenderTexture.ReleaseTemporary(stippleSource);
+        //Graphics.Blit(stippleSource, destination);
         Graphics.Blit(edgeSource, destination, inkMaterial, 11);
      }
 
