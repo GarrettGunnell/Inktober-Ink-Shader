@@ -74,14 +74,17 @@ public class Ink : MonoBehaviour {
             RenderTexture hysteresisSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(doubleThresholdSource, hysteresisSource, inkMaterial, 7);
 
+            RenderTexture widthSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
+            Graphics.Blit(hysteresisSource, widthSource, inkMaterial, 8);
+
             RenderTexture.ReleaseTemporary(luminanceSource);
             RenderTexture.ReleaseTemporary(gradientSource);
             RenderTexture.ReleaseTemporary(magThresholdSource);
             RenderTexture.ReleaseTemporary(doubleThresholdSource);
             RenderTexture.ReleaseTemporary(hysteresisSource);
+            RenderTexture.ReleaseTemporary(widthSource);
 
-            Graphics.Blit(hysteresisSource, destination, inkMaterial, 8);
-            //Graphics.Blit(hysteresisSource, destination);
+            Graphics.Blit(widthSource, destination, inkMaterial, 9);
         } else {
             RenderTexture.ReleaseTemporary(luminanceSource);
             
@@ -89,14 +92,17 @@ public class Ink : MonoBehaviour {
         }
      }
 
-     private void Capture() {
-        if (capturing) {
-            RenderTexture rt = new RenderTexture(600, 600, 24);
+     private void LateUpdate() {
+        if (capturing || Input.GetKeyDown(KeyCode.Space)) {
+            int width = useImage ? image.width : 600;
+            int height = useImage ? image.height : 600;
+
+            RenderTexture rt = new RenderTexture(width, height, 24);
             GetComponent<Camera>().targetTexture = rt;
-            Texture2D screenshot = new Texture2D(600, 600, TextureFormat.RGB24, false);
+            Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
             GetComponent<Camera>().Render();
             RenderTexture.active = rt;
-            screenshot.ReadPixels(new Rect(0, 0, 600, 600), 0, 0);
+            screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             GetComponent<Camera>().targetTexture = null;
             RenderTexture.active = null;
             Destroy(rt);

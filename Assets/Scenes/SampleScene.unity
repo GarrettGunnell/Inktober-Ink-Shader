@@ -312,10 +312,12 @@ MonoBehaviour:
   inkShader: {fileID: 4800000, guid: 94806dd6078f88642bf708a4aa8b5bdb, type: 3}
   background: {fileID: 2800000, guid: 62a4e203dba6f424e88e2ce3cc85800e, type: 3}
   lightObj: {fileID: 738919130}
+  image: {fileID: 2800000, guid: 90ecdf9630ac9624282feb4d9644ab5a, type: 3}
+  useImage: 0
   edgeDetector: 4
   contrastThreshold: 0.01
-  highThreshold: 0.8
-  lowThreshold: 0.11
+  highThreshold: 0.151
+  lowThreshold: 0.01
   capturing: 0
 --- !u!1 &1771996338
 GameObject:

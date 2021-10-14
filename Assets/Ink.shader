@@ -318,7 +318,43 @@
                     ink = 1.0f;
 
 
-                return 1 - ink;
+                return ink;
+            }
+
+            ENDCG
+        }
+
+        // Diffusion Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            float4 fp(v2f i) : SV_Target {
+                int x, y;
+                float4 ink = tex2D(_MainTex, i.uv);
+
+                float avg = 0.0f;
+                /*
+                for (x = -1; x <= 1; ++x) {
+                    for (y = -1; y <= 1; ++y) {
+                        //if (x == 0 && y == 0) continue;
+
+                        float2 nuv = i.uv + _MainTex_TexelSize * float2(x, y);
+                        
+                        half neighbor = tex2D(_MainTex, nuv).r;
+                        avg += neighbor;
+                    }
+                }
+                */
+                float n = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, 1)).r;
+                float e = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, 0)).r;
+                float s = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1)).r;
+                float w = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(-1, 0)).r;
+
+                avg = n + e + s + w + ink.r;
+                
+                return smoothstep(0.0, 1.0f, avg / 4.0f);
             }
 
             ENDCG
