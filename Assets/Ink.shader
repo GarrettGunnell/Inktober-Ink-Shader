@@ -8,10 +8,12 @@
 
         sampler2D _MainTex;
         sampler2D _PaperTex;
+        sampler2D _NoiseTex;
         float4 _MainTex_TexelSize;
         float _ContrastThreshold;
         float _HighThreshold;
         float _LowThreshold;
+        float _LuminanceCorrection;
 
         struct VertexData {
             float4 vertex : POSITION;
@@ -366,11 +368,15 @@
             #pragma vertex vp
             #pragma fragment fp
 
+            #include "Random.cginc"
+
             float4 fp(v2f i) : SV_Target {
                 float luminance = tex2D(_MainTex, i.uv).a;
+                float noise = LinearRgbToLuminance(tex2D(_NoiseTex, i.uv));
 
-                
-                return 1.0f;
+                luminance = pow(luminance, 1.0f / _LuminanceCorrection);
+
+                return luminance > noise ? 1.0f : 0.0f;
             }
 
             ENDCG

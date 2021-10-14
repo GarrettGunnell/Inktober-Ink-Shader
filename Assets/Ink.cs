@@ -12,6 +12,8 @@ public class Ink : MonoBehaviour {
     public Texture image;
     public bool useImage = false;
 
+    public Texture blueNoise;
+
     public enum EdgeDetector {
         contrast = 1,
         sobelFeldman,
@@ -28,6 +30,9 @@ public class Ink : MonoBehaviour {
 
     [Range(0.01f, 1.0f)]
     public float lowThreshold = 0.1f;
+
+    [Range(1.0f, 10.0f)]
+    public float luminanceCorrection = 1.0f;
 
     public bool capturing = false;
 
@@ -52,6 +57,8 @@ public class Ink : MonoBehaviour {
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         inkMaterial.SetFloat("_ContrastThreshold", contrastThreshold);
         inkMaterial.SetTexture("_PaperTex", background);
+        inkMaterial.SetTexture("_NoiseTex", blueNoise);
+        inkMaterial.SetFloat("_LuminanceCorrection", luminanceCorrection);
 
         int width = useImage ? image.width : source.width;
         int height = useImage ? image.height : source.height;
@@ -107,7 +114,8 @@ public class Ink : MonoBehaviour {
             GetComponent<Camera>().targetTexture = null;
             RenderTexture.active = null;
             Destroy(rt);
-            string filename = string.Format("{0}/../Recordings/{1:000000}.png", Application.dataPath, frameCount);
+            //string filename = string.Format("{0}/../Recordings/{1:000000}.png", Application.dataPath, frameCount);
+            string filename = string.Format("{0}/../Recordings/snap_{1}.png", Application.dataPath, System.DateTime.Now.ToString("HH-mm-ss"));
             System.IO.File.WriteAllBytes(filename, screenshot.EncodeToPNG());
         }
     }
