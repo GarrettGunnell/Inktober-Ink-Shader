@@ -36,6 +36,9 @@ public class Ink : MonoBehaviour {
     [Range(1.0f, 10.0f)]
     public float luminanceCorrection = 1.0f;
 
+    [Range(0.01f, 1.0f)]
+    public float stippleSize = 1.0f;
+
     public bool capturing = false;
 
     private Material inkMaterial;
@@ -62,6 +65,7 @@ public class Ink : MonoBehaviour {
         inkMaterial.SetTexture("_NoiseTex", blueNoise);
         inkMaterial.SetFloat("_LuminanceCorrection", luminanceCorrection);
         inkMaterial.SetFloat("_Contrast", luminanceContrast);
+        inkMaterial.SetFloat("_StippleSize", stippleSize);
 
         int width = useImage ? image.width : source.width;
         int height = useImage ? image.height : source.height;
