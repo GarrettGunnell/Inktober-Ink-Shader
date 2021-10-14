@@ -9,6 +9,7 @@
         sampler2D _MainTex;
         sampler2D _PaperTex;
         sampler2D _NoiseTex;
+        float4 _NoiseTex_TexelSize;
         float4 _MainTex_TexelSize;
         float _ContrastThreshold;
         float _HighThreshold;
@@ -23,12 +24,14 @@
         struct v2f {
             float2 uv : TEXCOORD0;
             float4 vertex : SV_POSITION;
+            float4 screenPosition : TEXCOORD1;
         };
 
         v2f vp(VertexData v) {
             v2f f;
             f.vertex = UnityObjectToClipPos(v.vertex);
             f.uv = v.uv;
+            f.screenPosition = ComputeScreenPos(f.vertex);
             
             return f;
         }
@@ -372,11 +375,15 @@
 
             float4 fp(v2f i) : SV_Target {
                 float luminance = tex2D(_MainTex, i.uv).a;
-                float noise = LinearRgbToLuminance(tex2D(_NoiseTex, i.uv));
+
+
+                float2 noiseCoord = i.screenPosition.xy / i.screenPosition.w;
+                noiseCoord *= _ScreenParams.xy * _NoiseTex_TexelSize.xy;
+                float noise = LinearRgbToLuminance(tex2Dlod(_NoiseTex, float4(noiseCoord.x, noiseCoord.y, 0, 0)));
 
                 luminance = pow(luminance, 1.0f / _LuminanceCorrection);
 
-                return luminance > noise ? 1.0f : 0.0f;
+                return luminance < noise ? 1.0f : 0.0f;
             }
 
             ENDCG
