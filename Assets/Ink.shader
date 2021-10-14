@@ -9,6 +9,7 @@
         sampler2D _MainTex;
         sampler2D _PaperTex;
         sampler2D _NoiseTex;
+        sampler2D _StippleTex;
         float4 _NoiseTex_TexelSize;
         float4 _MainTex_TexelSize;
         float _ContrastThreshold;
@@ -316,7 +317,7 @@
 
                 float4 topNeighbor = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1));
                 float4 rightNeighbor = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, -0));
-
+                
                 if (topNeighbor.a != 0.0f)
                     ink = 1.0f;
                 else if (rightNeighbor.a != 0.0f)
@@ -358,7 +359,7 @@
                 float w = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(-1, 0)).r;
 
                 avg = n + e + s + w + ink.r;
-                
+
                 return smoothstep(0.0, 1.0f, avg / 4.0f);
             }
 
@@ -384,6 +385,24 @@
                 luminance = pow(luminance, 1.0f / _LuminanceCorrection);
 
                 return luminance < noise ? 1.0f : 0.0f;
+            }
+
+            ENDCG
+        }
+        
+        // Combination Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            #include "Random.cginc"
+
+            float4 fp(v2f i) : SV_Target {
+                float edge = tex2D(_MainTex, i.uv).a;
+                float4 stipple = tex2D(_StippleTex, i.uv);
+
+                return 1 - (edge + stipple);
             }
 
             ENDCG

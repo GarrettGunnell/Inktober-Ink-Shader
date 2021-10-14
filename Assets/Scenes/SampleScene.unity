@@ -314,10 +314,12 @@ MonoBehaviour:
   lightObj: {fileID: 738919130}
   image: {fileID: 2800000, guid: 90ecdf9630ac9624282feb4d9644ab5a, type: 3}
   useImage: 0
+  blueNoise: {fileID: 2800000, guid: 122c52c3d7ea7704daa8341a40984001, type: 3}
   edgeDetector: 4
   contrastThreshold: 0.01
   highThreshold: 0.151
   lowThreshold: 0.01
+  luminanceCorrection: 1
   capturing: 0
 --- !u!1 &1771996338
 GameObject:

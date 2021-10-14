@@ -65,6 +65,8 @@ public class Ink : MonoBehaviour {
 
         RenderTexture luminanceSource = RenderTexture.GetTemporary(width, height, 0, source.format);
         Graphics.Blit(useImage ? image : source, luminanceSource, inkMaterial, 0);
+
+        RenderTexture edgeSource = RenderTexture.GetTemporary(width, height, 0, source.format);
         
         if (edgeDetector == EdgeDetector.canny) {
             inkMaterial.SetFloat("_LowThreshold", lowThreshold);
@@ -85,19 +87,28 @@ public class Ink : MonoBehaviour {
             RenderTexture widthSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(hysteresisSource, widthSource, inkMaterial, 8);
 
-            RenderTexture.ReleaseTemporary(luminanceSource);
             RenderTexture.ReleaseTemporary(gradientSource);
             RenderTexture.ReleaseTemporary(magThresholdSource);
             RenderTexture.ReleaseTemporary(doubleThresholdSource);
             RenderTexture.ReleaseTemporary(hysteresisSource);
             RenderTexture.ReleaseTemporary(widthSource);
 
-            Graphics.Blit(widthSource, destination, inkMaterial, 9);
+            Graphics.Blit(widthSource, edgeSource, inkMaterial, 9);
         } else {
-            RenderTexture.ReleaseTemporary(luminanceSource);
             
-            Graphics.Blit(luminanceSource, destination, inkMaterial, (int)edgeDetector);
+            Graphics.Blit(luminanceSource, edgeSource, inkMaterial, (int)edgeDetector);
         }
+
+        RenderTexture stippleSource = RenderTexture.GetTemporary(width, height, 0, source.format);
+        Graphics.Blit(luminanceSource, stippleSource, inkMaterial, 10);
+        RenderTexture.ReleaseTemporary(luminanceSource);
+
+        inkMaterial.SetTexture("_StippleTex", stippleSource);
+
+
+        RenderTexture.ReleaseTemporary(edgeSource);
+        RenderTexture.ReleaseTemporary(stippleSource);
+        Graphics.Blit(edgeSource, destination, inkMaterial, 11);
      }
 
      private void LateUpdate() {
