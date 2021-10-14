@@ -16,6 +16,7 @@
         float _HighThreshold;
         float _LowThreshold;
         float _LuminanceCorrection;
+        float _Contrast;
 
         struct VertexData {
             float4 vertex : POSITION;
@@ -382,7 +383,10 @@
                 noiseCoord *= _ScreenParams.xy * _NoiseTex_TexelSize.xy;
                 float noise = tex2Dlod(_NoiseTex, float4(noiseCoord.x, noiseCoord.y, 0, 0)).a;
 
+                luminance = _Contrast * (luminance - 0.5f) + 0.5f;
+                luminance = min(1.0f, max(0.0f, luminance));
                 luminance = pow(luminance, 1.0f / _LuminanceCorrection);
+                luminance = min(1.0f, max(0.0f, luminance));
 
                 return luminance < noise ? 1.0f : 0.0f;
             }

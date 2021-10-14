@@ -7,7 +7,6 @@ public class Ink : MonoBehaviour {
 
     public Shader inkShader;
     public Texture background;
-    public GameObject lightObj;
 
     public Texture image;
     public bool useImage = false;
@@ -30,6 +29,9 @@ public class Ink : MonoBehaviour {
 
     [Range(0.01f, 1.0f)]
     public float lowThreshold = 0.1f;
+
+    [Range(0.01f, 5.0f)]
+    public float luminanceContrast = 1.0f;
 
     [Range(1.0f, 10.0f)]
     public float luminanceCorrection = 1.0f;
@@ -59,6 +61,7 @@ public class Ink : MonoBehaviour {
         inkMaterial.SetTexture("_PaperTex", background);
         inkMaterial.SetTexture("_NoiseTex", blueNoise);
         inkMaterial.SetFloat("_LuminanceCorrection", luminanceCorrection);
+        inkMaterial.SetFloat("_Contrast", luminanceContrast);
 
         int width = useImage ? image.width : source.width;
         int height = useImage ? image.height : source.height;
@@ -95,7 +98,6 @@ public class Ink : MonoBehaviour {
 
             Graphics.Blit(widthSource, edgeSource);
         } else {
-            
             Graphics.Blit(luminanceSource, edgeSource, inkMaterial, (int)edgeDetector);
         }
 
