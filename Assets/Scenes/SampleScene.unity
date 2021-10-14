@@ -312,9 +312,9 @@ MonoBehaviour:
   inkShader: {fileID: 4800000, guid: 94806dd6078f88642bf708a4aa8b5bdb, type: 3}
   background: {fileID: 2800000, guid: 62a4e203dba6f424e88e2ce3cc85800e, type: 3}
   lightObj: {fileID: 738919130}
-  image: {fileID: 2800000, guid: 90ecdf9630ac9624282feb4d9644ab5a, type: 3}
+  image: {fileID: 2800000, guid: 47b87ed975eac4f4f832275063234ca6, type: 3}
   useImage: 0
-  blueNoise: {fileID: 2800000, guid: 122c52c3d7ea7704daa8341a40984001, type: 3}
+  blueNoise: {fileID: 2800000, guid: 41e25c6850cb0944eb0fab08459b5b9b, type: 3}
   edgeDetector: 4
   contrastThreshold: 0.01
   highThreshold: 0.151

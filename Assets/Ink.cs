@@ -93,7 +93,7 @@ public class Ink : MonoBehaviour {
             RenderTexture.ReleaseTemporary(hysteresisSource);
             RenderTexture.ReleaseTemporary(widthSource);
 
-            Graphics.Blit(widthSource, edgeSource, inkMaterial, 9);
+            Graphics.Blit(widthSource, edgeSource);
         } else {
             
             Graphics.Blit(luminanceSource, edgeSource, inkMaterial, (int)edgeDetector);

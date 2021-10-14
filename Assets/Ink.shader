@@ -380,7 +380,7 @@
 
                 float2 noiseCoord = i.screenPosition.xy / i.screenPosition.w;
                 noiseCoord *= _ScreenParams.xy * _NoiseTex_TexelSize.xy;
-                float noise = LinearRgbToLuminance(tex2Dlod(_NoiseTex, float4(noiseCoord.x, noiseCoord.y, 0, 0)));
+                float noise = tex2Dlod(_NoiseTex, float4(noiseCoord.x, noiseCoord.y, 0, 0)).a;
 
                 luminance = pow(luminance, 1.0f / _LuminanceCorrection);
 
