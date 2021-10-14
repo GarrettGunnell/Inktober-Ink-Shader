@@ -324,7 +324,7 @@
             ENDCG
         }
 
-        // Diffusion Pass
+        // Diffusion (Anti Aliasing) Pass
         Pass {
             CGPROGRAM
             #pragma vertex vp
@@ -355,6 +355,22 @@
                 avg = n + e + s + w + ink.r;
                 
                 return smoothstep(0.0, 1.0f, avg / 4.0f);
+            }
+
+            ENDCG
+        }
+
+        // Stippling Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            float4 fp(v2f i) : SV_Target {
+                float luminance = tex2D(_MainTex, i.uv).a;
+
+                
+                return 1.0f;
             }
 
             ENDCG

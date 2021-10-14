@@ -16,7 +16,8 @@ public class Ink : MonoBehaviour {
         contrast = 1,
         sobelFeldman,
         prewitt,
-        canny
+        canny,
+        stippling = 10
     } public EdgeDetector edgeDetector;
     
     [Range(0.01f, 1.0f)]
