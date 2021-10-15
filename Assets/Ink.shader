@@ -10,6 +10,7 @@
         sampler2D _PaperTex;
         sampler2D _NoiseTex;
         sampler2D _StippleTex;
+        sampler2D _LuminanceTex;
         float4 _NoiseTex_TexelSize;
         float4 _MainTex_TexelSize;
         float _ContrastThreshold;
@@ -316,15 +317,18 @@
             float4 fp(v2f i) : SV_Target {
                 int x, y;
                 float4 ink = tex2D(_MainTex, i.uv);
+                float luminance = tex2D(_LuminanceTex, i.uv).r;
+                float depth = 1 - Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r);
+                depth = min(1.0f, max(0.0f, depth));
 
 
                 float4 topNeighbor = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(0, -1));
                 float4 rightNeighbor = tex2D(_MainTex, i.uv + _MainTex_TexelSize * float2(1, -0));
                 
-                if (topNeighbor.a != 0.0f)
-                    ink = 1.0f;
-                else if (rightNeighbor.a != 0.0f)
-                    ink = 1.0f;
+
+                if ((topNeighbor.a != 0.0f || rightNeighbor.a != 0.0f) && luminance <= 0.7f) {
+                    ink = !_UsingImage ? 1.0f * depth : 1.0f;
+                }
 
 
                 return ink;

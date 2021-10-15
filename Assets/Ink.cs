@@ -87,6 +87,7 @@ public class Ink : MonoBehaviour {
             RenderTexture gradientSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(luminanceSource, gradientSource, inkMaterial, 4);
 
+            inkMaterial.SetTexture("_LuminanceTex", luminanceSource);
 
             RenderTexture magThresholdSource = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBFloat);
             Graphics.Blit(gradientSource, magThresholdSource, inkMaterial, 5);
