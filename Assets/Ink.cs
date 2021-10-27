@@ -6,7 +6,8 @@ using UnityEngine;
 public class Ink : MonoBehaviour {
 
     public Shader inkShader;
-    public Texture background;
+    public Texture paperTexture;
+    public Texture inkTexture;
 
     public Texture image;
     public bool useImage = false;
@@ -66,7 +67,6 @@ public class Ink : MonoBehaviour {
 
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         inkMaterial.SetFloat("_ContrastThreshold", contrastThreshold);
-        inkMaterial.SetTexture("_PaperTex", background);
         inkMaterial.SetTexture("_NoiseTex", blueNoise);
         inkMaterial.SetFloat("_LuminanceCorrection", luminanceCorrection);
         inkMaterial.SetFloat("_Contrast", luminanceContrast);
@@ -118,11 +118,17 @@ public class Ink : MonoBehaviour {
 
         inkMaterial.SetTexture("_StippleTex", stippleSource);
 
+        RenderTexture comboSource = RenderTexture.GetTemporary(width, height, 0, source.format);
+        Graphics.Blit(edgeSource, comboSource, inkMaterial, 11);
+
+        inkMaterial.SetTexture("_InkTex", inkTexture);
+        inkMaterial.SetTexture("_PaperTex", paperTexture);
 
         RenderTexture.ReleaseTemporary(edgeSource);
         RenderTexture.ReleaseTemporary(stippleSource);
-        //Graphics.Blit(stippleSource, destination);
-        Graphics.Blit(edgeSource, destination, inkMaterial, 11);
+        RenderTexture.ReleaseTemporary(comboSource);
+
+        Graphics.Blit(comboSource, destination, inkMaterial, 12);
      }
 
      private void LateUpdate() {

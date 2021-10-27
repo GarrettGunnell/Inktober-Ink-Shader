@@ -311,7 +311,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inkShader: {fileID: 4800000, guid: 94806dd6078f88642bf708a4aa8b5bdb, type: 3}
   background: {fileID: 2800000, guid: 62a4e203dba6f424e88e2ce3cc85800e, type: 3}
-  image: {fileID: 2800000, guid: 2bf5c0f045f36064ba22c3835fafb1ff, type: 3}
+  image: {fileID: 2800000, guid: 0480cae2f59180e49a19852f2c3e4f3a, type: 3}
   useImage: 0
   blueNoise: {fileID: 2800000, guid: e08c525995edc8545b7439cf131324eb, type: 3}
   edgeDetector: 4

@@ -11,6 +11,7 @@
         sampler2D _NoiseTex;
         sampler2D _StippleTex;
         sampler2D _LuminanceTex;
+        sampler2D _InkTex;
         float4 _NoiseTex_TexelSize;
         float4 _MainTex_TexelSize;
         float _ContrastThreshold;
@@ -424,6 +425,26 @@
                 }
 
                 return 1 - (edge + stipple);
+            }
+
+            ENDCG
+        }
+
+        // Color Pass
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
+            #include "Random.cginc"
+
+            float4 fp(v2f i) : SV_Target {
+                float4 ink = tex2D(_InkTex, i.uv);
+                float4 paper = tex2D(_PaperTex, i.uv);
+                float col = tex2D(_MainTex, i.uv).r;
+
+                
+                return col >= 1.0f ? paper : ink;
             }
 
             ENDCG
